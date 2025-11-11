@@ -13,5 +13,3 @@ export class CreateBookmarkDto {
   @IsOptional()
   description?: string;
 }
-
-

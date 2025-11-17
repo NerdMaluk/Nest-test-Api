@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   dev-db:
@@ -14,16 +14,17 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - nest-estagio
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nest"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  nestjs-test-api:
-    build: .
-    container_name: nestjs-test-api
+  prisma-client:
+    image: prisma/prisma-client-node
     depends_on:
       - dev-db
-    environment:
-      DATABASE_URL: postgresql://postgres:nerd1990@dev-db:5432/nest?schema=public
-    ports:
-      - "3000:3000"
     networks:
       - nest-estagio
 

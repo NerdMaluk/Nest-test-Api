@@ -5,6 +5,7 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +27,7 @@ export class AuthService {
         },
       });
       // return saved user
-      return this.signToken(user.id, user.email);
+      return this.signToken(user.id, user.email, user.role);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -61,12 +62,17 @@ export class AuthService {
       throw new ForbiddenException('Credentials incorrect');
     }
     //return user
-    return this.signToken(user.id, user.email);
+    return this.signToken(user.id, user.email, user.role);
   }
-  signToken(userId: number, email: string): Promise<{ access_token: string }> {
+  signToken(
+    userId: number,
+    email: string,
+    role: Role,
+  ): Promise<{ access_token: string }> {
     const payload = {
       sub: userId,
       email,
+      role,
     };
     const secret = this.config.get('JWT_SECRET') as string;
 
